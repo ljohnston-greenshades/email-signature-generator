@@ -25,7 +25,6 @@ export interface Banner {
 export interface SignatureConfig {
   name: string;
   title: string;
-  email?: string;
   phone?: string; // raw digits or formatted; normalized at render time
   includeLinkedIn: boolean;
   linkedInUrl?: string;

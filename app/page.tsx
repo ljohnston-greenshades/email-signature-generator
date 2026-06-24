@@ -11,7 +11,6 @@ import InstallInstructions from "@/components/InstallInstructions";
 const EMPTY: SignatureConfig = {
   name: "",
   title: "",
-  email: "",
   phone: "",
   includeLinkedIn: false,
   linkedInUrl: "",
@@ -68,7 +67,6 @@ export default function BuilderPage() {
           name: d.name || c.name,
           title: d.title || c.title,
           phone: d.phone || c.phone,
-          email: d.email || lookupEmail,
         }));
         const filled = ["name", "title", "phone"].filter((k) => d[k]);
         setLookupMsg({
@@ -76,8 +74,6 @@ export default function BuilderPage() {
           text: `Found your details (${filled.join(", ") || "email"}). Review and edit anything below.`,
         });
       } else {
-        // Still drop the email in so they don't retype it.
-        setConfig((c) => ({ ...c, email: lookupEmail }));
         setLookupMsg({
           type: "info",
           text: "We couldn't find a directory match — just fill in your details below.",
@@ -222,18 +218,6 @@ export default function BuilderPage() {
                 value={config.title}
                 placeholder="Account Executive"
                 onChange={(e) => update("title", e.target.value)}
-              />
-            </div>
-
-            <div className="field">
-              <label>
-                Email <span className="hint">— optional</span>
-              </label>
-              <input
-                type="email"
-                value={config.email}
-                placeholder="you@greenshades.com"
-                onChange={(e) => update("email", e.target.value)}
               />
             </div>
 

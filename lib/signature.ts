@@ -63,12 +63,6 @@ function labeledRow(label: string, href: string, display: string): string {
   return `<tr><td style="padding:0 0 1px 0;font-family:${BRAND.fonts.sans};font-size:13px;color:${BRAND.navy};line-height:1.3;"><span style="font-weight:bold;color:${BRAND.navy};">${label}</span>&nbsp;&nbsp;<a href="${href}" style="color:${BRAND.charcoal};text-decoration:none;">${display}</a></td></tr>`;
 }
 
-function emailRow(email?: string): string {
-  if (!email?.trim()) return "";
-  const safe = escapeHtml(email.trim());
-  return labeledRow("Email:", `mailto:${safe}`, safe);
-}
-
 function phoneRow(phone?: string): string {
   if (!phone?.trim()) return "";
   const normalized = normalizePhone(phone);
@@ -135,7 +129,6 @@ export function renderFullSignature(config: SignatureConfig, opts: RenderOptions
     `<table cellpadding="0" cellspacing="0" border="0" width="460" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">` +
     `<tr><td style="padding:0 0 1px 0;"><span style="display:block;font-family:${BRAND.fonts.serif};font-size:17px;font-weight:bold;color:${BRAND.navy};line-height:1.3;">${name}</span></td></tr>` +
     `<tr><td style="padding:0 0 11px 0;"><span style="display:block;font-family:${BRAND.fonts.sans};font-size:12px;font-weight:normal;color:${BRAND.charcoal};line-height:1.4;">${title}</span></td></tr>` +
-    emailRow(config.email) +
     phoneRow(config.phone) +
     linkedInRow(config.includeLinkedIn, config.linkedInUrl) +
     // CORRECTION: the "Web:" row is removed — the linked logo IS the website link.
