@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Logo from "@/components/Logo";
 
 export const metadata: Metadata = {
   title: "Greenshades Email Signature Builder",
@@ -12,10 +13,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <header className="site-header">
-          <div className="brand">
-            <span className="dot" />
-            Greenshades
-          </div>
+          <a href="/" className="brand" aria-label="Greenshades home">
+            <Logo height={30} />
+          </a>
           <nav>
             <a href="/">Signature Builder</a>
             <a href="/marketing">Marketing</a>

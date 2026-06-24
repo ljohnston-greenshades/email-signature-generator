@@ -216,7 +216,7 @@ export default function BuilderPage() {
                   </div>
                 </div>
                 {link.requiresUrl && config.links.includes(link.id) && (
-                  <div style={{ margin: "8px 0 4px 28px" }}>
+                  <div className="field" style={{ marginTop: 10, marginBottom: 4 }}>
                     <input
                       type="url"
                       value={config.meetingUrl}

@@ -91,7 +91,7 @@ function logoRow(): string {
 }
 
 function taglineRow(): string {
-  return `<tr><td style="padding:3px 0 0 0;font-family:${BRAND.fonts.serif};font-size:11px;font-style:italic;color:${BRAND.green};line-height:1.4;">${BRAND.tagline}</td></tr>`;
+  return `<tr><td style="padding:3px 0 0 0;font-family:${BRAND.fonts.humanist};font-size:12px;font-weight:600;color:${BRAND.green};line-height:1.4;letter-spacing:0.2px;">${BRAND.tagline}</td></tr>`;
 }
 
 function linksBlock(config: SignatureConfig): string {

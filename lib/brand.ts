@@ -23,10 +23,17 @@ export const BRAND = {
     alt: "Greenshades",
   },
 
-  // Fonts are locked. Georgia (serif) for the name + tagline, Arial for body.
+  // Fonts are locked. Georgia (serif) for the name, Arial for body contact rows.
+  // The tagline uses a humanist sans stack: it prefers Source Sans Pro (the
+  // Greenshades brand face) and degrades to the closest widely-installed
+  // humanist sans-serifs — Segoe UI on Windows/Outlook, then system fallbacks.
+  // Email clients can't load web fonts, so this stack is what guarantees a
+  // close visual match across Outlook variants without relying on @font-face.
   fonts: {
     serif: "Georgia,serif",
     sans: "Arial,sans-serif",
+    humanist:
+      "'Source Sans Pro','Source Sans 3','Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif",
   },
 } as const;
 

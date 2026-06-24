@@ -30,8 +30,8 @@ a {
 }
 
 .site-header {
-  background: var(--navy);
-  color: #fff;
+  background: #fff;
+  border-bottom: 1px solid var(--hairline);
   padding: 14px 24px;
   display: flex;
   align-items: center;
@@ -40,24 +40,16 @@ a {
 .site-header .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-weight: 700;
-  letter-spacing: 0.2px;
-}
-.site-header .brand .dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--green);
 }
 .site-header nav a {
-  color: #cfe6d8;
+  color: var(--navy);
   text-decoration: none;
   font-size: 14px;
-  margin-left: 18px;
+  font-weight: 600;
+  margin-left: 20px;
 }
 .site-header nav a:hover {
-  color: #fff;
+  color: var(--green);
 }
 
 .container {
