@@ -77,6 +77,7 @@ parallel and merges what the token's scopes allow, so it works with either:
 | `users` object search | name, **title, phone** | `crm.objects.users.read` |
 | Owners API | name, email (every seat) | `crm.objects.owners.read` |
 | `contacts` search | title, phone (if a contact record exists) | `crm.objects.contacts.read` |
+| Meetings/Scheduler API | the employee's personal **scheduling link** (auto-fills "Schedule a Meeting") | `scheduler.meetings.meeting-link.read` |
 
 A typical PAK already includes `crm.objects.owners.read` and
 `crm.objects.contacts.read`, so name resolves for everyone and title/phone resolve

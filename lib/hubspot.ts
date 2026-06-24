@@ -1,7 +1,7 @@
 // HubSpot directory lookup.
 //
 // Given an employee's email, prefill the signature builder with name, job title,
-// and phone as an editable starting point.
+// phone, and personal meeting/scheduling link as an editable starting point.
 //
 // Auth: a HubSpot token in env HUBSPOT_TOKEN, used as a Bearer token. This works
 // with either a Private App access token OR a Personal Access Key (PAK) — both
@@ -15,6 +15,8 @@
 //                                 crm.objects.owners.read
 //   3. `contacts` search       — enriches title/phone if the employee also has a
 //                                 contact record; needs crm.objects.contacts.read
+//   4. Meetings/Scheduler API  — the employee's personal scheduling page; needs
+//                                 scheduler.meetings.meeting-link.read
 //
 // Each source fails soft (a missing scope / 403 just yields nothing), so the
 // feature works with whatever scopes the configured token happens to have.
@@ -31,6 +33,8 @@ export interface EmployeeLookupResult {
   title?: string;
   phone?: string;
   email?: string;
+  /** The employee's HubSpot personal scheduling page URL, if they have one. */
+  meetingUrl?: string;
 }
 
 export function isHubSpotConfigured(): boolean {
@@ -47,7 +51,14 @@ function authHeaders(token: string) {
   return { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
 }
 
-type Partial = { name?: string; title?: string; phone?: string; email?: string };
+type Partial = {
+  name?: string;
+  title?: string;
+  phone?: string;
+  email?: string;
+  /** Numeric HubSpot user id, used to look up the personal scheduling page. */
+  userId?: string;
+};
 
 // 1. CRM `users` object — best source (has title + phone). Needs users.read.
 async function fromUsers(token: string, email: string): Promise<Partial | null> {
@@ -58,7 +69,14 @@ async function fromUsers(token: string, email: string): Promise<Partial | null> 
       cache: "no-store",
       body: JSON.stringify({
         filterGroups: [{ filters: [{ propertyName: "hs_email", operator: "EQ", value: email }] }],
-        properties: ["hs_given_name", "hs_family_name", "hs_job_title", "hs_main_phone", "hs_email"],
+        properties: [
+          "hs_given_name",
+          "hs_family_name",
+          "hs_job_title",
+          "hs_main_phone",
+          "hs_email",
+          "hs_internal_user_id",
+        ],
         limit: 1,
       }),
     });
@@ -71,13 +89,14 @@ async function fromUsers(token: string, email: string): Promise<Partial | null> 
       title: p.hs_job_title?.trim() || undefined,
       phone: p.hs_main_phone?.trim() || undefined,
       email: p.hs_email?.trim() || undefined,
+      userId: p.hs_internal_user_id?.trim() || undefined,
     };
   } catch {
     return null;
   }
 }
 
-// 2. Owners API — name + email for every HubSpot seat. Needs owners.read.
+// 2. Owners API — name + email + userId for every HubSpot seat. Needs owners.read.
 async function fromOwners(token: string, email: string): Promise<Partial | null> {
   try {
     const res = await fetch(`${API_BASE}/crm/v3/owners/?email=${encodeURIComponent(email)}&limit=1`, {
@@ -86,16 +105,37 @@ async function fromOwners(token: string, email: string): Promise<Partial | null>
     });
     if (!res.ok) return null;
     const data = (await res.json()) as {
-      results?: Array<{ firstName?: string; lastName?: string; email?: string }>;
+      results?: Array<{ firstName?: string; lastName?: string; email?: string; userId?: number }>;
     };
     const o = data.results?.[0];
     if (!o) return null;
     return {
       name: [o.firstName, o.lastName].filter(Boolean).join(" ").trim() || undefined,
       email: o.email?.trim() || undefined,
+      userId: o.userId != null ? String(o.userId) : undefined,
     };
   } catch {
     return null;
+  }
+}
+
+// 4. Meetings (Scheduler) API — the employee's personal scheduling page.
+// Needs scheduler.meetings.meeting-link.read. Returns the first page whose
+// organizerUserId matches this employee.
+async function fromMeetingLink(token: string, userId: string): Promise<string | undefined> {
+  try {
+    const res = await fetch(`${API_BASE}/scheduler/v3/meetings/meeting-links?limit=100`, {
+      headers: authHeaders(token),
+      cache: "no-store",
+    });
+    if (!res.ok) return undefined;
+    const data = (await res.json()) as {
+      results?: Array<{ link?: string; organizerUserId?: number | string }>;
+    };
+    const match = data.results?.find((m) => String(m.organizerUserId) === userId && m.link);
+    return match?.link?.trim() || undefined;
+  } catch {
+    return undefined;
   }
 }
 
@@ -137,6 +177,7 @@ function merge(...parts: Array<Partial | null>): Partial {
     out.title ??= part.title;
     out.phone ??= part.phone;
     out.email ??= part.email;
+    out.userId ??= part.userId;
   }
   return out;
 }
@@ -147,7 +188,7 @@ export async function lookupEmployee(emailRaw: string): Promise<EmployeeLookupRe
   if (!token) return { found: false };
   if (!isInternalEmail(email)) return { found: false };
 
-  // Run the three sources in parallel; each fails soft to null.
+  // Run the identity sources in parallel; each fails soft to null.
   const [users, owners, contacts] = await Promise.all([
     fromUsers(token, email),
     fromOwners(token, email),
@@ -158,11 +199,15 @@ export async function lookupEmployee(emailRaw: string): Promise<EmployeeLookupRe
   const merged = merge(users, owners, contacts);
   const found = Boolean(merged.name || merged.email);
 
+  // The scheduling page lookup depends on the resolved user id, so it runs after.
+  const meetingUrl = merged.userId ? await fromMeetingLink(token, merged.userId) : undefined;
+
   return {
     found,
     name: merged.name,
     title: merged.title,
     phone: merged.phone,
     email: merged.email || (found ? email : undefined),
+    meetingUrl,
   };
 }

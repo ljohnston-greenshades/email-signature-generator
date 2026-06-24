@@ -62,16 +62,25 @@ export default function BuilderPage() {
       if (!r.ok) {
         setLookupMsg({ type: "error", text: d.error || "Lookup failed." });
       } else if (d.found) {
-        setConfig((c) => ({
-          ...c,
-          name: d.name || c.name,
-          title: d.title || c.title,
-          phone: d.phone || c.phone,
-        }));
+        setConfig((c) => {
+          const next = {
+            ...c,
+            name: d.name || c.name,
+            title: d.title || c.title,
+            phone: d.phone || c.phone,
+          };
+          if (d.meetingUrl) {
+            next.meetingUrl = d.meetingUrl;
+            // Auto-select the "Schedule a Meeting" link (they can uncheck it).
+            if (!next.links.includes("meeting")) next.links = [...next.links, "meeting"];
+          }
+          return next;
+        });
         const filled = ["name", "title", "phone"].filter((k) => d[k]);
+        if (d.meetingUrl) filled.push("meeting link");
         setLookupMsg({
           type: "success",
-          text: `Found your details (${filled.join(", ") || "email"}). Review and edit anything below.`,
+          text: `Found your details (${filled.join(", ") || "name"}). Review and edit anything below.`,
         });
       } else {
         setLookupMsg({
