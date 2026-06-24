@@ -89,20 +89,43 @@ function taglineRow(): string {
 }
 
 function linksBlock(config: SignatureConfig): string {
-  const parts: string[] = [];
+  // Standard links render as inline, pipe-separated text. The "Schedule a
+  // meeting" option (D) is promoted to a standout green CTA button instead.
+  const inlineParts: string[] = [];
+  let meetingButton = "";
+
   for (const id of config.links) {
     const def = STANDARD_LINKS.find((l) => l.id === id);
     if (!def) continue;
-    const url = def.requiresUrl ? config.meetingUrl : def.url;
-    if (!url?.trim()) continue; // option D with no URL → skip
-    parts.push(
-      `<a href="${safeUrl(url)}" style="color:${BRAND.navy};text-decoration:underline;">${escapeHtml(def.text)}</a>`
-    );
+    if (def.requiresUrl) {
+      const url = config.meetingUrl;
+      if (!url?.trim()) continue; // option D with no URL → skip
+      // Outlook-safe button: a <td> with bgcolor + padding (border-radius is
+      // honored everywhere except classic Outlook, which shows a clean square).
+      meetingButton =
+        `<tr><td style="padding:12px 0 0 0;">` +
+        `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate;">` +
+        `<tr><td bgcolor="${BRAND.green}" style="background:${BRAND.green};border-radius:5px;padding:9px 18px;">` +
+        `<a href="${safeUrl(url)}" target="_blank" style="color:#ffffff;text-decoration:none;font-family:${BRAND.fonts.sans};font-size:13px;font-weight:bold;line-height:1;display:inline-block;">${escapeHtml(def.text)}</a>` +
+        `</td></tr></table></td></tr>`;
+    } else {
+      if (!def.url?.trim()) continue;
+      inlineParts.push(
+        `<a href="${safeUrl(def.url)}" style="color:${BRAND.navy};text-decoration:underline;">${escapeHtml(def.text)}</a>`
+      );
+    }
   }
-  if (parts.length === 0) return "";
+
+  if (inlineParts.length === 0 && !meetingButton) return "";
+
+  const hairline =
+    `<tr><td style="padding:10px 0 0 0;"><table cellpadding="0" cellspacing="0" border="0" width="460" style="border-collapse:collapse;"><tr><td width="460" height="1" bgcolor="${BRAND.hairline}" style="font-size:1px;line-height:1px;">&nbsp;</td></tr></table></td></tr>`;
   const separator = `<span style="color:${BRAND.pipe};margin:0 8px;">|</span>`;
-  const content = parts.join(separator);
-  return `<tr><td style="padding:10px 0 0 0;"><table cellpadding="0" cellspacing="0" border="0" width="460" style="border-collapse:collapse;"><tr><td width="460" height="1" bgcolor="${BRAND.hairline}" style="font-size:1px;line-height:1px;">&nbsp;</td></tr></table></td></tr><tr><td style="padding:10px 0 0 0;font-family:${BRAND.fonts.sans};font-size:13px;line-height:1.3;">${content}</td></tr>`;
+  const inlineRow = inlineParts.length
+    ? `<tr><td style="padding:10px 0 0 0;font-family:${BRAND.fonts.sans};font-size:13px;line-height:1.3;">${inlineParts.join(separator)}</td></tr>`
+    : "";
+
+  return hairline + inlineRow + meetingButton;
 }
 
 function bannerRow(banner?: Banner): string {
@@ -128,7 +151,7 @@ export function renderFullSignature(config: SignatureConfig, opts: RenderOptions
     `<body style="margin:0;padding:0;background:${BRAND.white};">` +
     `<table cellpadding="0" cellspacing="0" border="0" width="460" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">` +
     `<tr><td style="padding:0 0 1px 0;"><span style="display:block;font-family:${BRAND.fonts.serif};font-size:17px;font-weight:bold;color:${BRAND.navy};line-height:1.3;">${name}</span></td></tr>` +
-    `<tr><td style="padding:0 0 11px 0;"><span style="display:block;font-family:${BRAND.fonts.sans};font-size:12px;font-weight:normal;color:${BRAND.charcoal};line-height:1.4;">${title}</span></td></tr>` +
+    `<tr><td style="padding:0 0 1px 0;"><span style="display:block;font-family:${BRAND.fonts.sans};font-size:12px;font-weight:normal;color:${BRAND.charcoal};line-height:1.4;">${title}</span></td></tr>` +
     phoneRow(config.phone) +
     linkedInRow(config.includeLinkedIn, config.linkedInUrl) +
     // CORRECTION: the "Web:" row is removed — the linked logo IS the website link.

@@ -62,7 +62,7 @@ export const STANDARD_LINKS: StandardLinkDef[] = [
   },
   {
     id: "meeting",
-    text: "Schedule a Meeting",
+    text: "Schedule a meeting",
     requiresUrl: true,
     helper: "Paste your personal Calendly or HubSpot scheduling link",
   },
