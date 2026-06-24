@@ -39,7 +39,7 @@ export const BRAND = {
 
 // Standard, brand-approved link options shown below the logo. Text + URLs for
 // A/B/C are fully locked. D's text is locked; the employee supplies the URL.
-export type StandardLinkId = "support" | "ticket" | "login" | "meeting";
+export type StandardLinkId = "support" | "login" | "meeting";
 
 export interface StandardLinkDef {
   id: StandardLinkId;
@@ -54,11 +54,6 @@ export const STANDARD_LINKS: StandardLinkDef[] = [
     id: "support",
     text: "Visit our Support Center",
     url: "https://support.greenshadesonline.com",
-  },
-  {
-    id: "ticket",
-    text: "Submit a Ticket",
-    url: "https://support.greenshadesonline.com/SignIn?returnUrl=%2F",
   },
   {
     id: "login",
