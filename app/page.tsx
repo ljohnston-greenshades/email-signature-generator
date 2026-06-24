@@ -265,11 +265,14 @@ export default function BuilderPage() {
               {config.includeLinkedIn && (
                 <div style={{ marginTop: 10 }}>
                   <input
-                    type="url"
+                    type="text"
                     value={config.linkedInUrl}
-                    placeholder="https://www.linkedin.com/in/yourprofile"
+                    placeholder="your-username  or  linkedin.com/in/your-username"
                     onChange={(e) => update("linkedInUrl", e.target.value)}
                   />
+                  <div className="meta" style={{ marginTop: 4 }}>
+                    Paste your full profile URL or just your username — we'll tidy it up.
+                  </div>
                 </div>
               )}
             </div>

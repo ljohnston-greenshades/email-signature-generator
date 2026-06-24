@@ -71,12 +71,32 @@ function phoneRow(phone?: string): string {
 }
 
 /**
+ * Normalize whatever the employee pastes into a clean LinkedIn profile URL.
+ * Accepts a full URL, a bare "linkedin.com/in/handle", "in/handle", or just
+ * "handle". Returns "" if there's nothing usable.
+ */
+export function normalizeLinkedIn(input: string): string {
+  let v = input.trim();
+  if (!v) return "";
+  // Already a full URL → leave the scheme/host intact.
+  if (/^https?:\/\//i.test(v)) return v;
+  // Starts at the domain → just add the scheme.
+  if (/^(www\.)?linkedin\.com\//i.test(v)) return `https://${v.replace(/^www\./i, "www.")}`;
+  // Otherwise treat it as a handle, tolerating a leading "in/" or slashes.
+  const handle = v.replace(/^\/?(in\/)?/i, "").replace(/^\/+/, "").replace(/\/+$/, "");
+  if (!handle) return "";
+  return `https://www.linkedin.com/in/${handle}`;
+}
+
+/**
  * LinkedIn — CORRECTION from the CMO skill: we never render a raw LinkedIn URL.
  * Instead we show polished, clickable text ("Connect with me on LinkedIn").
  */
 function linkedInRow(include: boolean, url?: string): string {
-  if (!include || !url?.trim()) return "";
-  return `<tr><td style="padding:0 0 1px 0;font-family:${BRAND.fonts.sans};font-size:13px;line-height:1.3;"><a href="${safeUrl(url)}" style="color:${BRAND.navy};text-decoration:none;font-weight:bold;">${LINKEDIN_DISPLAY_TEXT}</a></td></tr>`;
+  if (!include) return "";
+  const href = normalizeLinkedIn(url || "");
+  if (!href) return "";
+  return `<tr><td style="padding:0 0 1px 0;font-family:${BRAND.fonts.sans};font-size:13px;line-height:1.3;"><a href="${safeUrl(href)}" style="color:${BRAND.navy};text-decoration:none;font-weight:bold;">${LINKEDIN_DISPLAY_TEXT}</a></td></tr>`;
 }
 
 function logoRow(): string {
