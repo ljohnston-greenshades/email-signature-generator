@@ -15,8 +15,20 @@ import type { Banner } from "./types";
 
 const MANIFEST_PATH = "banners/manifest.json";
 
+// Vercel normally provides BLOB_READ_WRITE_TOKEN, but when a store is connected
+// with a custom prefix the var can be named e.g. "myStore_BLOB_READ_WRITE_TOKEN".
+// Resolve either form so configuration is forgiving, and pass the token
+// explicitly to every SDK call so it works regardless of the var name.
+export function getBlobToken(): string | undefined {
+  if (process.env.BLOB_READ_WRITE_TOKEN) return process.env.BLOB_READ_WRITE_TOKEN;
+  for (const [key, value] of Object.entries(process.env)) {
+    if (value && key.endsWith("BLOB_READ_WRITE_TOKEN")) return value;
+  }
+  return undefined;
+}
+
 export function isBlobConfigured(): boolean {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+  return Boolean(getBlobToken());
 }
 
 export class BlobNotConfiguredError extends Error {
@@ -32,7 +44,7 @@ async function readManifest(): Promise<Banner[]> {
   if (!isBlobConfigured()) return [];
   try {
     // Find the current manifest blob (it has a stable pathname).
-    const { blobs } = await list({ prefix: MANIFEST_PATH });
+    const { blobs } = await list({ prefix: MANIFEST_PATH, token: getBlobToken() });
     const manifest = blobs.find((b) => b.pathname === MANIFEST_PATH);
     if (!manifest) return [];
     const res = await fetch(manifest.url, { cache: "no-store" });
@@ -50,6 +62,7 @@ async function writeManifest(banners: Banner[]): Promise<void> {
     contentType: "application/json",
     addRandomSuffix: false,
     allowOverwrite: true,
+    token: getBlobToken(),
   });
 }
 
@@ -87,6 +100,7 @@ export async function saveBanner(input: SaveBannerInput): Promise<Banner> {
       contentType: input.imageContentType || "image/png",
       addRandomSuffix: false,
       allowOverwrite: true,
+      token: getBlobToken(),
     });
     banner.imageUrl = uploaded.url;
   }
@@ -107,7 +121,7 @@ export async function deleteBanner(id: string): Promise<void> {
   await writeManifest(remaining);
   if (target?.imageUrl) {
     try {
-      await del(target.imageUrl);
+      await del(target.imageUrl, { token: getBlobToken() });
     } catch {
       // Image already gone — manifest is the source of truth, ignore.
     }
