@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "Greenshades Email Signature Builder",
   description:
     "Build a personalized, brand-compliant Greenshades email signature for Outlook.",
+  icons: {
+    icon: "https://go.greenshades.com/hubfs/greenshades-favicon.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

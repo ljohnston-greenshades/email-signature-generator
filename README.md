@@ -47,6 +47,8 @@ Set these in Vercel (Project → Settings → Environment Variables):
 | `MARKETING_PASSWORD` | Marketing login | Shared password for the Marketing team. Without it, the builder still works for everyone; only banner management is disabled. |
 | `AUTH_SECRET` | Session signing | Random string used to sign the session cookie. Defaults to `MARKETING_PASSWORD` if unset, but set a separate value in production. |
 | `BLOB_READ_WRITE_TOKEN` | Banner storage | Set automatically when you connect a Vercel Blob store (Storage → Create → Blob). Without it, the builder works but banner uploads are disabled. |
+| `HUBSPOT_TOKEN` | Directory prefill | HubSpot Private App token with the `crm.objects.users.read` scope. Enables the "prefill from the directory" box: an employee enters their email and their name/title/phone are pulled from HubSpot. Without it, the prefill box is hidden and the builder works manually. |
+| `ALLOWED_EMAIL_DOMAIN` | Directory prefill | Optional. Restricts lookups to one email domain. Defaults to `greenshades.com`. |
 
 The app **degrades gracefully** when these are missing: employees can always
 build signatures; only the marketing features require configuration.
@@ -58,6 +60,22 @@ build signatures; only the marketing features require configuration.
    `BLOB_READ_WRITE_TOKEN`.
 3. Add `MARKETING_PASSWORD` and `AUTH_SECRET` env vars.
 4. Production deploys from the `main` branch.
+
+## HubSpot directory prefill
+
+Greenshades employees are HubSpot **users**. With a Private App token set as
+`HUBSPOT_TOKEN`, the builder shows a prefill box: an employee enters their
+`@greenshades.com` email and the app looks them up in the HubSpot `users` object
+(`hs_given_name`, `hs_family_name`, `hs_job_title`, `hs_main_phone`) to populate
+the form as a starting point. All values remain editable.
+
+To create the token: HubSpot → Settings → Integrations → Private Apps → create an
+app with the `crm.objects.users.read` scope, then copy its access token into
+`HUBSPOT_TOKEN`. Lookups are restricted to `ALLOWED_EMAIL_DOMAIN` so the endpoint
+can't be used to pull external contact data.
+
+Title and phone prefill only when those fields are populated on the HubSpot user
+record; name and email always resolve.
 
 ## Upgrading authentication to SSO
 

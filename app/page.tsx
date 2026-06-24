@@ -26,13 +26,69 @@ export default function BuilderPage() {
   const [bannersLoading, setBannersLoading] = useState(true);
   const [copied, setCopied] = useState<"full" | "reply" | null>(null);
 
+  // HubSpot directory prefill
+  const [lookupEnabled, setLookupEnabled] = useState(false);
+  const [lookupDomain, setLookupDomain] = useState("greenshades.com");
+  const [lookupEmail, setLookupEmail] = useState("");
+  const [lookupBusy, setLookupBusy] = useState(false);
+  const [lookupMsg, setLookupMsg] = useState<{ type: "info" | "error" | "success"; text: string } | null>(null);
+
   useEffect(() => {
     fetch("/api/banners")
       .then((r) => r.json())
       .then((d) => setBanners(d.banners || []))
       .catch(() => setBanners([]))
       .finally(() => setBannersLoading(false));
+
+    fetch("/api/lookup")
+      .then((r) => r.json())
+      .then((d) => {
+        setLookupEnabled(Boolean(d.configured));
+        if (d.domain) setLookupDomain(d.domain);
+      })
+      .catch(() => setLookupEnabled(false));
   }, []);
+
+  async function prefillFromDirectory(e: React.FormEvent) {
+    e.preventDefault();
+    setLookupBusy(true);
+    setLookupMsg(null);
+    try {
+      const r = await fetch("/api/lookup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: lookupEmail }),
+      });
+      const d = await r.json();
+      if (!r.ok) {
+        setLookupMsg({ type: "error", text: d.error || "Lookup failed." });
+      } else if (d.found) {
+        setConfig((c) => ({
+          ...c,
+          name: d.name || c.name,
+          title: d.title || c.title,
+          phone: d.phone || c.phone,
+          email: d.email || lookupEmail,
+        }));
+        const filled = ["name", "title", "phone"].filter((k) => d[k]);
+        setLookupMsg({
+          type: "success",
+          text: `Found your details (${filled.join(", ") || "email"}). Review and edit anything below.`,
+        });
+      } else {
+        // Still drop the email in so they don't retype it.
+        setConfig((c) => ({ ...c, email: lookupEmail }));
+        setLookupMsg({
+          type: "info",
+          text: "We couldn't find a directory match — just fill in your details below.",
+        });
+      }
+    } catch {
+      setLookupMsg({ type: "error", text: "Network error." });
+    } finally {
+      setLookupBusy(false);
+    }
+  }
 
   const selectedBanner = useMemo(
     () => banners.find((b) => b.id === config.bannerId),
@@ -103,6 +159,42 @@ export default function BuilderPage() {
       <div className="layout">
         {/* ----------------------------- FORM ----------------------------- */}
         <div>
+          {lookupEnabled && (
+            <div className="card" style={{ marginBottom: 24, borderColor: "#cfe0fb" }}>
+              <h2>⚡ Start with your directory details</h2>
+              <p className="card-sub">
+                Enter your Greenshades email and we'll prefill your name, title, and phone from the
+                company directory. You can edit everything afterward.
+              </p>
+              <form onSubmit={prefillFromDirectory}>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  <input
+                    type="email"
+                    value={lookupEmail}
+                    placeholder={`you@${lookupDomain}`}
+                    onChange={(e) => setLookupEmail(e.target.value)}
+                    style={{
+                      flex: "1 1 220px",
+                      padding: "9px 11px",
+                      border: "1px solid #cdd5df",
+                      borderRadius: 7,
+                      fontSize: 14,
+                      fontFamily: "inherit",
+                    }}
+                  />
+                  <button className="btn btn-primary" disabled={lookupBusy || !lookupEmail.trim()}>
+                    {lookupBusy ? "Looking up…" : "Prefill"}
+                  </button>
+                </div>
+              </form>
+              {lookupMsg && (
+                <div className={`notice notice-${lookupMsg.type}`} style={{ marginTop: 14, marginBottom: 0 }}>
+                  {lookupMsg.text}
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="card">
             <h2>Your details</h2>
             <p className="card-sub">
