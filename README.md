@@ -47,7 +47,7 @@ Set these in Vercel (Project → Settings → Environment Variables):
 | `MARKETING_PASSWORD` | Marketing login | Shared password for the Marketing team. Without it, the builder still works for everyone; only banner management is disabled. |
 | `AUTH_SECRET` | Session signing | Random string used to sign the session cookie. Defaults to `MARKETING_PASSWORD` if unset, but set a separate value in production. |
 | `BLOB_READ_WRITE_TOKEN` | Banner storage | Set automatically when you connect a Vercel Blob store (Storage → Create → Blob). Without it, the builder works but banner uploads are disabled. |
-| `HUBSPOT_TOKEN` | Directory prefill | HubSpot Private App token with the `crm.objects.users.read` scope. Enables the "prefill from the directory" box: an employee enters their email and their name/title/phone are pulled from HubSpot. Without it, the prefill box is hidden and the builder works manually. |
+| `HUBSPOT_TOKEN` | Directory prefill | A HubSpot Bearer token — either a **Private App access token** or a **Personal Access Key (PAK)**. Enables the "prefill from the directory" box. Without it, the prefill box is hidden and the builder works manually. See scopes below. |
 | `ALLOWED_EMAIL_DOMAIN` | Directory prefill | Optional. Restricts lookups to one email domain. Defaults to `greenshades.com`. |
 
 The app **degrades gracefully** when these are missing: employees can always
@@ -63,19 +63,28 @@ build signatures; only the marketing features require configuration.
 
 ## HubSpot directory prefill
 
-Greenshades employees are HubSpot **users**. With a Private App token set as
-`HUBSPOT_TOKEN`, the builder shows a prefill box: an employee enters their
-`@greenshades.com` email and the app looks them up in the HubSpot `users` object
-(`hs_given_name`, `hs_family_name`, `hs_job_title`, `hs_main_phone`) to populate
-the form as a starting point. All values remain editable.
+With a HubSpot Bearer token set as `HUBSPOT_TOKEN`, the builder shows a prefill
+box: an employee enters their `@greenshades.com` email and the app prefills name,
+title, and phone as an editable starting point. Lookups are restricted to
+`ALLOWED_EMAIL_DOMAIN` so the endpoint can't be used to pull external contact data.
 
-To create the token: HubSpot → Settings → Integrations → Private Apps → create an
-app with the `crm.objects.users.read` scope, then copy its access token into
-`HUBSPOT_TOKEN`. Lookups are restricted to `ALLOWED_EMAIL_DOMAIN` so the endpoint
-can't be used to pull external contact data.
+**The token can be a Private App access token or your Personal Access Key (PAK)** —
+both are sent as `Authorization: Bearer`. The lookup tries three sources in
+parallel and merges what the token's scopes allow, so it works with either:
 
-Title and phone prefill only when those fields are populated on the HubSpot user
-record; name and email always resolve.
+| Source | Gives | Scope needed |
+|---|---|---|
+| `users` object search | name, **title, phone** | `crm.objects.users.read` |
+| Owners API | name, email (every seat) | `crm.objects.owners.read` |
+| `contacts` search | title, phone (if a contact record exists) | `crm.objects.contacts.read` |
+
+A typical PAK already includes `crm.objects.owners.read` and
+`crm.objects.contacts.read`, so name resolves for everyone and title/phone resolve
+when the employee has a contact record. To get title/phone directly from the
+employee's user record regardless, add `crm.objects.users.read` to the token.
+
+Each source fails soft — a missing scope simply contributes nothing rather than
+erroring — so configuration is forgiving.
 
 ## Upgrading authentication to SSO
 
