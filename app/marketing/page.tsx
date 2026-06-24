@@ -154,7 +154,10 @@ function BannerManager({ onSignOut }: { onSignOut: () => void }) {
         <div className="notice notice-warn">
           Banner storage isn't connected yet. In Vercel, add a <strong>Blob</strong> store to this
           project (Storage → Create → Blob); it sets <code>BLOB_READ_WRITE_TOKEN</code> automatically.
-          Until then, uploads will fail.
+          <br />
+          <strong>Already connected it?</strong> Env vars only take effect on a new deployment —
+          trigger a redeploy (Vercel → Deployments → ⋯ → Redeploy, or push any commit) and reload
+          this page.
         </div>
       )}
 
