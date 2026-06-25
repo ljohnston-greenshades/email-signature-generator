@@ -74,22 +74,29 @@ function linkedInBadge(href: string): string {
 
 function contactLine(config: SignatureConfig): string {
   const cells: string[] = [];
+  const gap = `<td width="12" style="width:12px;font-size:0;line-height:0;">&nbsp;</td>`;
+  const textStyle = `font-family:${BRAND.fonts.sans};font-size:13px;line-height:18px;color:${BRAND.navy};`;
 
-  if (config.phone?.trim()) {
-    const n = normalizePhone(config.phone);
-    if (n) {
-      cells.push(
-        `<td valign="middle" style="font-family:${BRAND.fonts.sans};font-size:13px;line-height:18px;color:${BRAND.navy};"><a href="tel:${escapeHtml(n.href)}" style="color:${BRAND.navy};text-decoration:none;">${escapeHtml(n.display)}</a></td>`
-      );
-    }
+  const phone = config.phone?.trim() ? normalizePhone(config.phone) : null;
+  const liHref = config.includeLinkedIn ? normalizeLinkedIn(config.linkedInUrl || "") : "";
+
+  if (phone) {
+    cells.push(
+      `<td valign="middle" style="${textStyle}"><a href="tel:${escapeHtml(phone.href)}" style="color:${BRAND.navy};text-decoration:none;">${escapeHtml(phone.display)}</a></td>`
+    );
   }
 
-  if (config.includeLinkedIn) {
-    const href = normalizeLinkedIn(config.linkedInUrl || "");
-    if (href) {
-      if (cells.length) cells.push(`<td width="12" style="width:12px;font-size:0;line-height:0;">&nbsp;</td>`);
-      cells.push(linkedInBadge(href));
+  if (liHref) {
+    // With no phone, the badge would sit alone — label it "Connect with me" in
+    // the slot the phone would have occupied. When a phone is present, leave the
+    // line exactly as-is (number + badge, no label).
+    if (!phone) {
+      cells.push(
+        `<td valign="middle" style="${textStyle}"><a href="${safeUrl(liHref)}" style="color:${BRAND.navy};text-decoration:none;">Connect with me</a></td>`
+      );
     }
+    if (cells.length) cells.push(gap);
+    cells.push(linkedInBadge(liHref));
   }
 
   if (cells.length === 0) return "";
