@@ -318,6 +318,57 @@ a {
   border: none;
 }
 
+.stepper {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.step-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  padding: 6px 14px 6px 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  font-family: inherit;
+}
+.step-chip:hover {
+  border-color: #cdd5df;
+}
+.step-chip .step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #eef0f3;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+.step-chip.active {
+  border-color: var(--navy);
+  color: var(--navy);
+}
+.step-chip.active .step-num {
+  background: var(--navy);
+  color: #fff;
+}
+.step-chip.done {
+  color: var(--navy);
+}
+.step-chip.done .step-num {
+  background: var(--green);
+  color: #fff;
+}
+
 .reply-disclosure {
   border-top: 1px solid var(--hairline);
   margin-top: 22px;

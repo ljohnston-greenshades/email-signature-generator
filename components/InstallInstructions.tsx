@@ -6,14 +6,6 @@ export default function InstallInstructions({ hasReply = true }: { hasReply?: bo
       <h2>⚙️ Installing in Outlook</h2>
       <p className="card-sub">Takes about a minute — copy, paste, done.</p>
 
-      <div className="notice notice-info">
-        <strong>Why this renders consistently:</strong> the signature is built from an HTML table
-        with inline styles (no SVG, no background images). When you paste it into the Outlook
-        signature editor, Outlook downloads the logo and stores it <em>locally</em> inside the
-        signature — so the "block external images" setting that affects received mail doesn't affect
-        your signature.
-      </div>
-
       <ol>
         <li>
           Open signature settings:
