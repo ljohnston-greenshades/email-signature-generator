@@ -24,6 +24,7 @@ const STEPS = [
   { id: 1, label: "Your details" },
   { id: 2, label: "Links" },
   { id: 3, label: "Banner" },
+  { id: 4, label: "Install" },
 ];
 
 export default function BuilderPage() {
@@ -166,23 +167,23 @@ export default function BuilderPage() {
         </p>
       </div>
 
+      <div className="stepper">
+        {STEPS.map((s) => (
+          <button
+            key={s.id}
+            type="button"
+            className={`step-chip${step === s.id ? " active" : ""}${step > s.id ? " done" : ""}`}
+            onClick={() => setStep(s.id)}
+          >
+            <span className="step-num">{step > s.id ? "✓" : s.id}</span>
+            <span>{s.label}</span>
+          </button>
+        ))}
+      </div>
+
       <div className="layout">
         {/* --------------------------- STEPPED FORM --------------------------- */}
         <div>
-          <div className="stepper">
-            {STEPS.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                className={`step-chip${step === s.id ? " active" : ""}${step > s.id ? " done" : ""}`}
-                onClick={() => setStep(s.id)}
-              >
-                <span className="step-num">{step > s.id ? "✓" : s.id}</span>
-                <span>{s.label}</span>
-              </button>
-            ))}
-          </div>
-
           {/* STEP 1 — your details (+ directory prefill) */}
           {step === 1 && (
             <div className="card">
@@ -394,6 +395,9 @@ export default function BuilderPage() {
             </div>
           )}
 
+          {/* STEP 4 — install in Outlook */}
+          {step === 4 && <InstallInstructions hasReply={config.replyStyle !== "none"} />}
+
           {/* step navigation */}
           <div
             className="btn-row"
@@ -415,7 +419,7 @@ export default function BuilderPage() {
                 Next →
               </button>
             ) : (
-              <span className="meta">Done — copy your signature from the preview →</span>
+              <span />
             )}
           </div>
         </div>
@@ -490,8 +494,6 @@ export default function BuilderPage() {
           </div>
         </div>
       </div>
-
-      <InstallInstructions hasReply={config.replyStyle !== "none"} />
     </main>
   );
 }
