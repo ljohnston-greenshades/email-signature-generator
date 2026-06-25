@@ -21,7 +21,8 @@ export const BRAND = {
     // White/reversed wordmark for dark email backgrounds. When set, the signature
     // ships both logos and swaps to this one in dark-mode-aware clients. Leave
     // empty to render navy only.
-    darkSrc: "",
+    darkSrc:
+      "https://go.greenshades.com/hubfs/2026%20Branding%20Folder%20%5BLD%5D/GS%20Wordmark%20alternate.png",
     href: "https://go.greenshades.com",
     width: 160,
     alt: "Greenshades",
