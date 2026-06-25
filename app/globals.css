@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&display=swap");
+
 :root {
   --navy: #062a47;
   --green: #0a8944;
@@ -59,7 +61,9 @@ a {
 }
 
 .intro h1 {
-  font-size: 26px;
+  font-family: "PT Serif", Georgia, serif;
+  font-weight: 700;
+  font-size: 28px;
   color: var(--navy);
   margin: 0 0 6px;
 }

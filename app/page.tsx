@@ -39,7 +39,7 @@ export default function BuilderPage() {
   const [lookupDomain, setLookupDomain] = useState("greenshades.com");
   const [lookupUser, setLookupUser] = useState("");
   const [lookupBusy, setLookupBusy] = useState(false);
-  const [lookupMsg, setLookupMsg] = useState<{ type: "info" | "error" | "success"; text: string } | null>(null);
+  const [lookupMsg, setLookupMsg] = useState<{ type: "info" | "error" | "success" | "warn"; text: string } | null>(null);
 
   useEffect(() => {
     fetch("/api/banners")
@@ -92,8 +92,8 @@ export default function BuilderPage() {
         const filled = ["name", "title", "phone"].filter((k) => d[k]);
         if (d.meetingUrl) filled.push("meeting link");
         setLookupMsg({
-          type: "success",
-          text: `Found your details (${filled.join(", ") || "name"}). Review and edit anything below.`,
+          type: "warn",
+          text: `⚠️ Found your details (${filled.join(", ") || "name"}). These came from HubSpot and may be incomplete or out of date — please review each field below and correct anything that's wrong before copying your signature.`,
         });
       } else {
         setLookupMsg({
