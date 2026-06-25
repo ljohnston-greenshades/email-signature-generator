@@ -143,17 +143,6 @@ export default function BuilderPage() {
     }
   }
 
-  function download(which: "full" | "reply") {
-    const html = which === "full" ? fullHtml : replyHtml;
-    const blob = new Blob([html], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = which === "full" ? "Greenshades - Full.htm" : "Greenshades - Reply.htm";
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
   return (
     <main className="container">
       <div className="intro">
@@ -389,9 +378,6 @@ export default function BuilderPage() {
               >
                 {copied === "full" ? "✓ Copied!" : "Copy full signature"}
               </button>
-              <button className="btn btn-secondary" disabled={!ready} onClick={() => download("full")}>
-                Download .htm
-              </button>
             </div>
 
             <p className="preview-label">Reply signature — for replies &amp; forwards</p>
@@ -403,13 +389,6 @@ export default function BuilderPage() {
                 onClick={() => copySignature("reply")}
               >
                 {copied === "reply" ? "✓ Copied!" : "Copy reply signature"}
-              </button>
-              <button
-                className="btn btn-secondary"
-                disabled={!ready}
-                onClick={() => download("reply")}
-              >
-                Download .htm
               </button>
             </div>
           </div>
