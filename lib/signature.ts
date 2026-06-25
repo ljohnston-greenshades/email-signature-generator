@@ -59,15 +59,34 @@ export function normalizePhone(raw: string): { display: string; href: string } |
 // margins can't bleed through on copy — preserved from the CMO's locked design.
 // ---------------------------------------------------------------------------
 
-function labeledRow(label: string, href: string, display: string): string {
-  return `<tr><td style="padding:0 0 1px 0;font-family:${BRAND.fonts.sans};font-size:13px;color:${BRAND.navy};line-height:1.3;"><span style="font-weight:bold;color:${BRAND.navy};">${label}</span>&nbsp;&nbsp;<a href="${href}" style="color:${BRAND.charcoal};text-decoration:none;">${display}</a></td></tr>`;
-}
+// A single, understated contact line: phone and LinkedIn share one row, the
+// same weight and color, joined by a soft middot. No "Phone:" label — a phone
+// number reads as a phone number. LinkedIn is no longer the only bold element,
+// so the name stays the sole anchor.
+function contactLine(config: SignatureConfig): string {
+  const items: string[] = [];
 
-function phoneRow(phone?: string): string {
-  if (!phone?.trim()) return "";
-  const normalized = normalizePhone(phone);
-  if (!normalized) return "";
-  return labeledRow("Phone:", `tel:${escapeHtml(normalized.href)}`, escapeHtml(normalized.display));
+  if (config.phone?.trim()) {
+    const n = normalizePhone(config.phone);
+    if (n) {
+      items.push(
+        `<a href="tel:${escapeHtml(n.href)}" style="color:${BRAND.navy};text-decoration:none;">${escapeHtml(n.display)}</a>`
+      );
+    }
+  }
+
+  if (config.includeLinkedIn) {
+    const href = normalizeLinkedIn(config.linkedInUrl || "");
+    if (href) {
+      items.push(
+        `<a href="${safeUrl(href)}" style="color:${BRAND.navy};text-decoration:none;">${LINKEDIN_DISPLAY_TEXT}</a>`
+      );
+    }
+  }
+
+  if (items.length === 0) return "";
+  const separator = `<span style="color:${BRAND.pipe};padding:0 8px;">&middot;</span>`;
+  return `<tr><td style="padding:2px 0 1px 0;font-family:${BRAND.fonts.sans};font-size:13px;line-height:1.4;color:${BRAND.navy};">${items.join(separator)}</td></tr>`;
 }
 
 /**
@@ -86,17 +105,6 @@ export function normalizeLinkedIn(input: string): string {
   const handle = v.replace(/^\/?(in\/)?/i, "").replace(/^\/+/, "").replace(/\/+$/, "");
   if (!handle) return "";
   return `https://www.linkedin.com/in/${handle}`;
-}
-
-/**
- * LinkedIn — CORRECTION from the CMO skill: we never render a raw LinkedIn URL.
- * Instead we show polished, clickable text ("Connect with me on LinkedIn").
- */
-function linkedInRow(include: boolean, url?: string): string {
-  if (!include) return "";
-  const href = normalizeLinkedIn(url || "");
-  if (!href) return "";
-  return `<tr><td style="padding:0 0 1px 0;font-family:${BRAND.fonts.sans};font-size:13px;line-height:1.3;"><a href="${safeUrl(href)}" style="color:${BRAND.navy};text-decoration:none;font-weight:bold;">${LINKEDIN_DISPLAY_TEXT}</a></td></tr>`;
 }
 
 function logoRow(): string {
@@ -172,8 +180,7 @@ export function renderFullSignature(config: SignatureConfig, opts: RenderOptions
     `<table cellpadding="0" cellspacing="0" border="0" width="460" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">` +
     `<tr><td style="padding:0 0 1px 0;"><span style="display:block;font-family:${BRAND.fonts.serif};font-size:17px;font-weight:bold;color:${BRAND.navy};line-height:1.3;">${name}</span></td></tr>` +
     `<tr><td style="padding:0 0 1px 0;"><span style="display:block;font-family:${BRAND.fonts.sans};font-size:12px;font-weight:normal;color:${BRAND.charcoal};line-height:1.4;">${title}</span></td></tr>` +
-    phoneRow(config.phone) +
-    linkedInRow(config.includeLinkedIn, config.linkedInUrl) +
+    contactLine(config) +
     // CORRECTION: the "Web:" row is removed — the linked logo IS the website link.
     // Spacer between contact details and the logo block.
     `<tr><td style="padding:0 0 11px 0;font-size:0;line-height:0;">&nbsp;</td></tr>` +

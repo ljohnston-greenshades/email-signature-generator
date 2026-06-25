@@ -68,4 +68,4 @@ export const STANDARD_LINKS: StandardLinkDef[] = [
   },
 ];
 
-export const LINKEDIN_DISPLAY_TEXT = "Connect with me on LinkedIn";
+export const LINKEDIN_DISPLAY_TEXT = "Connect on LinkedIn";
