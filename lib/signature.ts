@@ -74,7 +74,7 @@ function linkedInBadge(href: string): string {
 
 function contactLine(config: SignatureConfig): string {
   const cells: string[] = [];
-  const gap = `<td width="12" style="width:12px;font-size:0;line-height:0;">&nbsp;</td>`;
+  const gap = (w: number) => `<td width="${w}" style="width:${w}px;font-size:0;line-height:0;">&nbsp;</td>`;
   const textStyle = `font-family:${BRAND.fonts.sans};font-size:13px;line-height:18px;color:${BRAND.navy};`;
 
   const phone = config.phone?.trim() ? normalizePhone(config.phone) : null;
@@ -87,15 +87,16 @@ function contactLine(config: SignatureConfig): string {
   }
 
   if (liHref) {
-    // With no phone, the badge would sit alone — label it "Connect with me" in
-    // the slot the phone would have occupied. When a phone is present, leave the
-    // line exactly as-is (number + badge, no label).
     if (!phone) {
+      // No phone: label the badge "Connect with me", snug against the icon.
       cells.push(
         `<td valign="middle" style="${textStyle}"><a href="${safeUrl(liHref)}" style="color:${BRAND.navy};text-decoration:none;">Connect with me</a></td>`
       );
+      cells.push(gap(6));
+    } else {
+      // Phone present: unchanged spacing between the number and the badge.
+      cells.push(gap(12));
     }
-    if (cells.length) cells.push(gap);
     cells.push(linkedInBadge(liHref));
   }
 
