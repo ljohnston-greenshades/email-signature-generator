@@ -12,17 +12,12 @@ export const BRAND = {
 
   tagline: "One platform. Every worker. No exceptions.",
 
-  // The logo is hosted as a PNG. When pasted into the Outlook signature editor,
-  // Outlook downloads and localizes the image, so the "block hosted images"
-  // behavior that affects received mail does not affect the signature itself.
-  // PNG (not SVG) is required — Outlook's Word rendering engine cannot draw SVG.
+  // Single logo that works on both light and dark email backgrounds (dark
+  // wordmark with a faint white outline), so no dark-mode swap is needed.
+  // When pasted into Outlook, the hosted PNG is downloaded and localized.
+  // PNG (not SVG) is required — Outlook's Word engine cannot draw SVG.
   logo: {
-    src: "https://go.greenshades.com/hubfs/2026%20Branding%20Folder%20%5BLD%5D/GS%20Wordmark%20standard.png",
-    // White/reversed wordmark for dark email backgrounds. When set, the signature
-    // ships both logos and swaps to this one in dark-mode-aware clients. Leave
-    // empty to render navy only.
-    darkSrc:
-      "https://go.greenshades.com/hubfs/2026%20Branding%20Folder%20%5BLD%5D/GS%20Wordmark%20alternate.png",
+    src: "https://go.greenshades.com/hubfs/2026%20Branding%20Folder%20%5BLD%5D/GS%20Wordmark%20email.png",
     // The logo links to greenshades.com with hard-coded UTM tracking so every
     // signature's logo click is attributable. Conventions match the banner UTM
     // builder (source=email_signature, medium=email); content=signature_logo
