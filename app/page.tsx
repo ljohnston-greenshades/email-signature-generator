@@ -95,7 +95,7 @@ export default function BuilderPage() {
         if (count <= 1) {
           setLookupMsg({
             type: "error",
-            text: "We only found your name — you'll have to complete the rest of the details below. Double-check everything before copying.",
+            text: "We only found your name — please complete the rest of the details. Verify everything before copying your signature.",
           });
         } else if (count === 2) {
           setLookupMsg({
@@ -105,7 +105,7 @@ export default function BuilderPage() {
         } else {
           setLookupMsg({
             type: "success",
-            text: "Found your details — finish anything missing and verify it all before copying.",
+            text: "Found your details — finish anything missing and verify before copying your signature.",
           });
         }
       } else {
