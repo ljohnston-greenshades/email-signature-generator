@@ -201,6 +201,12 @@ function bannerRow(banner?: Banner): string {
 
 export interface RenderOptions {
   banner?: Banner;
+  /**
+   * When true, omit the dark-mode logo swap. Used for the in-app preview, which
+   * always sits on a white background — without this, a viewer whose OS is in
+   * dark mode would see the white logo vanish against the white preview.
+   */
+  preview?: boolean;
 }
 
 /** Full signature for New Messages. */
@@ -209,7 +215,7 @@ export function renderFullSignature(config: SignatureConfig, opts: RenderOptions
   const title = escapeHtml(config.title.trim());
 
   return (
-    `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">${darkModeStyle()}</head>` +
+    `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">${opts.preview ? "" : darkModeStyle()}</head>` +
     `<body style="margin:0;padding:0;background:${BRAND.white};">` +
     `<table cellpadding="0" cellspacing="0" border="0" width="460" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">` +
     `<tr><td style="padding:0 0 1px 0;"><span style="display:block;font-family:${BRAND.fonts.serif};font-size:17px;font-weight:bold;color:${BRAND.navy};line-height:1.3;">${name}</span></td></tr>` +

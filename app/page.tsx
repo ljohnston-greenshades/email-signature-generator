@@ -106,8 +106,14 @@ export default function BuilderPage() {
 
   const ready = config.name.trim().length > 0 && config.title.trim().length > 0;
 
+  // fullHtml is what gets copied (keeps the dark-mode logo swap). fullPreviewHtml
+  // is what the iframe shows — always navy, since the preview is on white.
   const fullHtml = useMemo(
     () => renderFullSignature(config, { banner: selectedBanner }),
+    [config, selectedBanner]
+  );
+  const fullPreviewHtml = useMemo(
+    () => renderFullSignature(config, { banner: selectedBanner, preview: true }),
     [config, selectedBanner]
   );
   const replyHtml = useMemo(() => renderReplySignature(config), [config]);
@@ -369,7 +375,7 @@ export default function BuilderPage() {
             )}
 
             <p className="preview-label">Full signature — for new messages</p>
-            <SignaturePreview html={fullHtml} />
+            <SignaturePreview html={fullPreviewHtml} />
             <div className="btn-row">
               <button
                 className="btn btn-primary"
