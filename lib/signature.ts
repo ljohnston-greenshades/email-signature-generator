@@ -118,9 +118,32 @@ export function normalizeLinkedIn(input: string): string {
   return `https://www.linkedin.com/in/${handle}`;
 }
 
+// Dark-mode <style> hook: swaps the navy logo for the white one in clients that
+// honor prefers-color-scheme / Outlook.com's [data-ogsc]. Emitted only when a
+// dark logo is configured; otherwise the signature is navy-only.
+function darkModeStyle(): string {
+  if (!BRAND.logo.darkSrc?.trim()) return "";
+  return (
+    `<style>` +
+    `@media (prefers-color-scheme:dark){.gs-logo-light{display:none!important}.gs-logo-dark{display:block!important}}` +
+    `[data-ogsc] .gs-logo-light{display:none!important}[data-ogsc] .gs-logo-dark{display:block!important}` +
+    `</style>`
+  );
+}
+
 function logoRow(): string {
   const { logo } = BRAND;
-  return `<tr><td style="padding:0 0 5px 0;"><a href="${logo.href}" target="_blank" style="text-decoration:none;display:block;"><img src="${logo.src}" alt="${logo.alt}" width="${logo.width}" border="0" style="display:block;width:${logo.width}px;height:auto;max-width:${logo.width}px;"></a></td></tr>`;
+  const dark = logo.darkSrc?.trim();
+  const lightImg =
+    `<img src="${logo.src}" alt="${logo.alt}" width="${logo.width}" border="0" class="gs-logo-light" ` +
+    `style="display:block;width:${logo.width}px;height:auto;max-width:${logo.width}px;">`;
+  // White logo hidden by default (inline display:none + mso-hide) so any client
+  // that ignores the dark-mode rule safely shows only the navy logo.
+  const darkImg = dark
+    ? `<img src="${escapeHtml(dark)}" alt="${logo.alt}" width="${logo.width}" border="0" class="gs-logo-dark" ` +
+      `style="display:none;mso-hide:all;width:${logo.width}px;height:auto;max-width:${logo.width}px;">`
+    : "";
+  return `<tr><td style="padding:0 0 5px 0;"><a href="${logo.href}" target="_blank" style="text-decoration:none;display:block;">${lightImg}${darkImg}</a></td></tr>`;
 }
 
 function taglineRow(): string {
@@ -186,7 +209,7 @@ export function renderFullSignature(config: SignatureConfig, opts: RenderOptions
   const title = escapeHtml(config.title.trim());
 
   return (
-    `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head>` +
+    `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">${darkModeStyle()}</head>` +
     `<body style="margin:0;padding:0;background:${BRAND.white};">` +
     `<table cellpadding="0" cellspacing="0" border="0" width="460" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">` +
     `<tr><td style="padding:0 0 1px 0;"><span style="display:block;font-family:${BRAND.fonts.serif};font-size:17px;font-weight:bold;color:${BRAND.navy};line-height:1.3;">${name}</span></td></tr>` +

@@ -18,6 +18,10 @@ export const BRAND = {
   // PNG (not SVG) is required — Outlook's Word rendering engine cannot draw SVG.
   logo: {
     src: "https://go.greenshades.com/hubfs/2026%20Branding%20Folder%20%5BLD%5D/GS%20Wordmark%20standard.png",
+    // White/reversed wordmark for dark email backgrounds. When set, the signature
+    // ships both logos and swaps to this one in dark-mode-aware clients. Leave
+    // empty to render navy only.
+    darkSrc: "",
     href: "https://go.greenshades.com",
     width: 160,
     alt: "Greenshades",
