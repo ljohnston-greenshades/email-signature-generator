@@ -91,10 +91,23 @@ export default function BuilderPage() {
         });
         const filled = ["name", "title", "phone"].filter((k) => d[k]);
         if (d.meetingUrl) filled.push("meeting link");
-        setLookupMsg({
-          type: "warn",
-          text: `⚠️ Found your details (${filled.join(", ") || "name"}). These came from HubSpot and may be incomplete or out of date — please review each field below and correct anything that's wrong before copying your signature.`,
-        });
+        const count = filled.length;
+        if (count <= 1) {
+          setLookupMsg({
+            type: "error",
+            text: "We only found your name — you'll have to complete the rest of the details below. Double-check everything before copying.",
+          });
+        } else if (count === 2) {
+          setLookupMsg({
+            type: "warn",
+            text: `Found ${count} details — verify them and fill in the missing fields below.`,
+          });
+        } else {
+          setLookupMsg({
+            type: "success",
+            text: "Found your details — finish anything missing and verify it all before copying.",
+          });
+        }
       } else {
         setLookupMsg({
           type: "info",
