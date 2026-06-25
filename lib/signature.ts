@@ -232,16 +232,25 @@ export function renderFullSignature(config: SignatureConfig, opts: RenderOptions
   );
 }
 
-/** Compact signature for Replies & Forwards. */
+/** Compact signature for Replies & Forwards. "" when the style is "none". */
 export function renderReplySignature(config: SignatureConfig): string {
+  const style = config.replyStyle ?? "compact";
+  if (style === "none") return "";
+
   const name = escapeHtml(config.name.trim());
   const title = escapeHtml(config.title.trim());
+  // "minimal" drops the title line, leaving name + company only.
+  const titleRow =
+    style === "compact" && title
+      ? `<tr><td style="padding:0 0 1px 0;"><span style="display:block;font-family:${BRAND.fonts.sans};font-size:12px;font-weight:normal;color:${BRAND.charcoal};">${title}</span></td></tr>`
+      : "";
+
   return (
     `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head>` +
     `<body style="margin:0;padding:0;background:${BRAND.white};">` +
     `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">` +
     `<tr><td style="padding:0 0 1px 0;"><span style="display:block;font-family:${BRAND.fonts.sans};font-size:14px;font-weight:bold;color:${BRAND.navy};">${name}</span></td></tr>` +
-    `<tr><td style="padding:0 0 1px 0;"><span style="display:block;font-family:${BRAND.fonts.sans};font-size:12px;font-weight:normal;color:${BRAND.charcoal};">${title}</span></td></tr>` +
+    titleRow +
     `<tr><td style="padding:0;"><span style="display:block;font-family:${BRAND.fonts.sans};font-size:12px;font-weight:normal;color:${BRAND.navy};">Greenshades</span></td></tr>` +
     `</table></body></html>`
   );

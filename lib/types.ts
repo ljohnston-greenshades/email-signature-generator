@@ -34,4 +34,6 @@ export interface SignatureConfig {
   meetingUrl?: string;
   /** Selected banner id, if any. */
   bannerId?: string;
+  /** Reply/forward signature style. Defaults to "compact". */
+  replyStyle?: "compact" | "minimal" | "none";
 }

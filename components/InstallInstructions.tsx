@@ -1,6 +1,6 @@
 "use client";
 
-export default function InstallInstructions() {
+export default function InstallInstructions({ hasReply = true }: { hasReply?: boolean }) {
   return (
     <div className="card install" style={{ marginTop: 24 }}>
       <h2>⚙️ Installing in Outlook</h2>
@@ -31,12 +31,14 @@ export default function InstallInstructions() {
           (<code>Ctrl+V</code> / <code>Cmd+V</code>) into the editor. Set it as the default for{" "}
           <strong>New messages</strong>.
         </li>
-        <li>
-          Add a second signature named <code>Greenshades - Reply</code> using{" "}
-          <strong>Copy reply signature</strong>; set it as the default for{" "}
-          <strong>Replies/forwards</strong>.
-        </li>
-        <li>Send yourself a test email to confirm both look correct.</li>
+        {hasReply && (
+          <li>
+            Add a second signature named <code>Greenshades - Reply</code> using{" "}
+            <strong>Copy reply signature</strong>; set it as the default for{" "}
+            <strong>Replies/forwards</strong>.
+          </li>
+        )}
+        <li>Send yourself a test email to confirm {hasReply ? "both look" : "it looks"} correct.</li>
       </ol>
 
       <div className="notice notice-warn" style={{ marginTop: 16 }}>
