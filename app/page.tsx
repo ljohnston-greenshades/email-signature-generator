@@ -224,7 +224,7 @@ export default function BuilderPage() {
                         <input
                           type="text"
                           value={lookupUser}
-                          placeholder="first.last"
+                          placeholder="your-email"
                           autoComplete="username"
                           onChange={(e) => setLookupUser(e.target.value)}
                           style={{
