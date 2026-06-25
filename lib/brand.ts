@@ -23,7 +23,12 @@ export const BRAND = {
     // empty to render navy only.
     darkSrc:
       "https://go.greenshades.com/hubfs/2026%20Branding%20Folder%20%5BLD%5D/GS%20Wordmark%20alternate.png",
-    href: "https://go.greenshades.com",
+    // The logo links to greenshades.com with hard-coded UTM tracking so every
+    // signature's logo click is attributable. Conventions match the banner UTM
+    // builder (source=email_signature, medium=email); content=signature_logo
+    // distinguishes a logo click from a banner click (content=signature_banner).
+    href:
+      "https://go.greenshades.com/?utm_source=email_signature&utm_medium=email&utm_campaign=employee_signature&utm_content=signature_logo",
     width: 160,
     alt: "Greenshades",
   },

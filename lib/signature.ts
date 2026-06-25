@@ -151,7 +151,7 @@ function logoRow(): string {
     ? `<img src="${escapeHtml(dark)}" alt="${logo.alt}" width="${logo.width}" border="0" class="gs-logo-dark" ` +
       `style="display:none;mso-hide:all;width:${logo.width}px;height:auto;max-width:${logo.width}px;">`
     : "";
-  return `<tr><td style="padding:0 0 5px 0;"><a href="${logo.href}" target="_blank" style="text-decoration:none;display:block;">${lightImg}${darkImg}</a></td></tr>`;
+  return `<tr><td style="padding:0 0 5px 0;"><a href="${safeUrl(logo.href)}" target="_blank" style="text-decoration:none;display:block;">${lightImg}${darkImg}</a></td></tr>`;
 }
 
 function taglineRow(): string {
