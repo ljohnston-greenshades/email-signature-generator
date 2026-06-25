@@ -33,12 +33,13 @@ export default function InstallInstructions({ hasReply = true }: { hasReply?: bo
         </li>
         {hasReply && (
           <li>
-            Add a second signature named <code>Greenshades - Reply</code> using{" "}
-            <strong>Copy reply signature</strong>; set it as the default for{" "}
-            <strong>Replies/forwards</strong>.
+            <em>Optional:</em> for a shorter reply/forward signature, expand{" "}
+            <strong>Reply signature</strong> above, click <strong>Copy reply signature</strong>, add
+            it as a second signature named <code>Greenshades - Reply</code>, and set it as the
+            default for <strong>Replies/forwards</strong>.
           </li>
         )}
-        <li>Send yourself a test email to confirm {hasReply ? "both look" : "it looks"} correct.</li>
+        <li>Send yourself a test email to confirm it looks correct.</li>
       </ol>
 
       <div className="notice notice-warn" style={{ marginTop: 16 }}>

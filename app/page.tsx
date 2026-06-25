@@ -387,57 +387,46 @@ export default function BuilderPage() {
               </button>
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 10,
-                flexWrap: "wrap",
-                margin: "18px 0 8px",
-              }}
-            >
-              <p className="preview-label" style={{ margin: 0 }}>
-                Reply signature — for replies &amp; forwards
-              </p>
-              <select
-                value={config.replyStyle}
-                onChange={(e) =>
-                  update("replyStyle", e.target.value as SignatureConfig["replyStyle"])
-                }
-                style={{
-                  padding: "6px 9px",
-                  border: "1px solid #cdd5df",
-                  borderRadius: 7,
-                  fontSize: 13,
-                  fontFamily: "inherit",
-                  background: "#fff",
-                }}
-              >
-                <option value="compact">Compact — name, title, company</option>
-                <option value="minimal">Minimal — name, company</option>
-                <option value="none">None</option>
-              </select>
-            </div>
-            {config.replyStyle === "none" ? (
-              <div className="notice notice-info" style={{ marginBottom: 0 }}>
-                No reply signature — your replies and forwards will use whatever default you keep in
-                Outlook (or none).
-              </div>
-            ) : (
-              <>
-                <SignaturePreview html={replyHtml} />
-                <div className="btn-row">
-                  <button
-                    className="btn btn-primary"
-                    disabled={!ready}
-                    onClick={() => copySignature("reply")}
+            <details className="reply-disclosure">
+              <summary>
+                Reply signature
+                <span className="reply-hint">— optional, for replies &amp; forwards</span>
+              </summary>
+              <div style={{ marginTop: 14 }}>
+                <div className="field" style={{ marginBottom: 14 }}>
+                  <label>Style</label>
+                  <select
+                    value={config.replyStyle}
+                    onChange={(e) =>
+                      update("replyStyle", e.target.value as SignatureConfig["replyStyle"])
+                    }
                   >
-                    {copied === "reply" ? "✓ Copied!" : "Copy reply signature"}
-                  </button>
+                    <option value="compact">Compact — name, title, company</option>
+                    <option value="minimal">Minimal — name, company</option>
+                    <option value="none">None</option>
+                  </select>
                 </div>
-              </>
-            )}
+                {config.replyStyle === "none" ? (
+                  <div className="notice notice-info" style={{ marginBottom: 0 }}>
+                    No reply signature — your replies and forwards will use whatever default you keep
+                    in Outlook (or none).
+                  </div>
+                ) : (
+                  <>
+                    <SignaturePreview html={replyHtml} />
+                    <div className="btn-row">
+                      <button
+                        className="btn btn-primary"
+                        disabled={!ready}
+                        onClick={() => copySignature("reply")}
+                      >
+                        {copied === "reply" ? "✓ Copied!" : "Copy reply signature"}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </details>
           </div>
         </div>
       </div>
