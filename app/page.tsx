@@ -28,7 +28,7 @@ export default function BuilderPage() {
   // HubSpot directory prefill
   const [lookupEnabled, setLookupEnabled] = useState(false);
   const [lookupDomain, setLookupDomain] = useState("greenshades.com");
-  const [lookupEmail, setLookupEmail] = useState("");
+  const [lookupUser, setLookupUser] = useState("");
   const [lookupBusy, setLookupBusy] = useState(false);
   const [lookupMsg, setLookupMsg] = useState<{ type: "info" | "error" | "success"; text: string } | null>(null);
 
@@ -52,11 +52,15 @@ export default function BuilderPage() {
     e.preventDefault();
     setLookupBusy(true);
     setLookupMsg(null);
+    // The domain is automated: people type only their username. If someone
+    // pastes a full address anyway, respect it rather than double-appending.
+    const entry = lookupUser.trim();
+    const email = entry.includes("@") ? entry : `${entry}@${lookupDomain}`;
     try {
       const r = await fetch("/api/lookup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: lookupEmail }),
+        body: JSON.stringify({ email }),
       });
       const d = await r.json();
       if (!r.ok) {
@@ -168,27 +172,54 @@ export default function BuilderPage() {
             <div className="card" style={{ marginBottom: 24, borderColor: "#cfe0fb" }}>
               <h2>⚡ Start with your directory details</h2>
               <p className="card-sub">
-                Enter your Greenshades email and we'll prefill your name, title, and phone from the
-                company directory. You can edit everything afterward.
+                Type your username — we'll add <strong>@{lookupDomain}</strong> and prefill your
+                name, title, phone, and meeting link from the company directory. You can edit
+                everything afterward.
               </p>
               <form onSubmit={prefillFromDirectory}>
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                  <input
-                    type="email"
-                    value={lookupEmail}
-                    placeholder={`you@${lookupDomain}`}
-                    onChange={(e) => setLookupEmail(e.target.value)}
+                  <div
                     style={{
-                      flex: "1 1 220px",
-                      padding: "9px 11px",
+                      display: "flex",
+                      flex: "1 1 240px",
                       border: "1px solid #cdd5df",
                       borderRadius: 7,
-                      fontSize: 14,
-                      fontFamily: "inherit",
+                      overflow: "hidden",
+                      background: "#fff",
                     }}
-                  />
-                  <button className="btn btn-primary" disabled={lookupBusy || !lookupEmail.trim()}>
-                    {lookupBusy ? "Looking up…" : "Prefill"}
+                  >
+                    <input
+                      type="text"
+                      value={lookupUser}
+                      placeholder="first.last"
+                      autoComplete="username"
+                      onChange={(e) => setLookupUser(e.target.value)}
+                      style={{
+                        flex: 1,
+                        minWidth: 0,
+                        border: "none",
+                        outline: "none",
+                        padding: "9px 11px",
+                        fontSize: 14,
+                        fontFamily: "inherit",
+                      }}
+                    />
+                    <span
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        padding: "0 12px",
+                        background: "#f0f2f5",
+                        color: "var(--muted)",
+                        fontSize: 14,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      @{lookupDomain}
+                    </span>
+                  </div>
+                  <button className="btn btn-primary" disabled={lookupBusy || !lookupUser.trim()}>
+                    {lookupBusy ? "Looking up…" : "Prefill my details"}
                   </button>
                 </div>
               </form>

@@ -59,18 +59,27 @@ export function normalizePhone(raw: string): { display: string; href: string } |
 // margins can't bleed through on copy — preserved from the CMO's locked design.
 // ---------------------------------------------------------------------------
 
-// A single, understated contact line: phone and LinkedIn share one row, the
-// same weight and color, joined by a soft middot. No "Phone:" label — a phone
-// number reads as a phone number. LinkedIn is no longer the only bold element,
-// so the name stays the sole anchor.
+// A single, understated contact line: the phone number and a small on-brand
+// LinkedIn "in" badge share one row, vertically centered. No "Phone:" label and
+// no floating link text — the badge is an instantly-recognizable icon built
+// from a table cell (no image; renders in every Outlook).
+function linkedInBadge(href: string): string {
+  return (
+    `<td valign="middle" width="18" align="center" bgcolor="${BRAND.navy}" ` +
+    `style="background:${BRAND.navy};border-radius:4px;width:18px;height:18px;text-align:center;vertical-align:middle;">` +
+    `<a href="${safeUrl(href)}" target="_blank" title="${LINKEDIN_DISPLAY_TEXT}" ` +
+    `style="color:#ffffff;text-decoration:none;font-family:${BRAND.fonts.sans};font-size:11px;font-weight:bold;line-height:18px;display:block;">in</a></td>`
+  );
+}
+
 function contactLine(config: SignatureConfig): string {
-  const items: string[] = [];
+  const cells: string[] = [];
 
   if (config.phone?.trim()) {
     const n = normalizePhone(config.phone);
     if (n) {
-      items.push(
-        `<a href="tel:${escapeHtml(n.href)}" style="color:${BRAND.navy};text-decoration:none;">${escapeHtml(n.display)}</a>`
+      cells.push(
+        `<td valign="middle" style="font-family:${BRAND.fonts.sans};font-size:13px;line-height:18px;color:${BRAND.navy};"><a href="tel:${escapeHtml(n.href)}" style="color:${BRAND.navy};text-decoration:none;">${escapeHtml(n.display)}</a></td>`
       );
     }
   }
@@ -78,15 +87,17 @@ function contactLine(config: SignatureConfig): string {
   if (config.includeLinkedIn) {
     const href = normalizeLinkedIn(config.linkedInUrl || "");
     if (href) {
-      items.push(
-        `<a href="${safeUrl(href)}" style="color:${BRAND.navy};text-decoration:none;">${LINKEDIN_DISPLAY_TEXT}</a>`
-      );
+      if (cells.length) cells.push(`<td width="12" style="width:12px;font-size:0;line-height:0;">&nbsp;</td>`);
+      cells.push(linkedInBadge(href));
     }
   }
 
-  if (items.length === 0) return "";
-  const separator = `<span style="color:${BRAND.pipe};padding:0 8px;">&middot;</span>`;
-  return `<tr><td style="padding:2px 0 1px 0;font-family:${BRAND.fonts.sans};font-size:13px;line-height:1.4;color:${BRAND.navy};">${items.join(separator)}</td></tr>`;
+  if (cells.length === 0) return "";
+  return (
+    `<tr><td style="padding:3px 0 1px 0;">` +
+    `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate;mso-table-lspace:0pt;mso-table-rspace:0pt;"><tr>${cells.join("")}</tr></table>` +
+    `</td></tr>`
+  );
 }
 
 /**
