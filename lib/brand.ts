@@ -62,7 +62,7 @@ export const STANDARD_LINKS: StandardLinkDef[] = [
   },
   {
     id: "login",
-    text: "Log In to Greenshades",
+    text: "Log in to Greenshades",
     url: "https://www.greenshadesonline.com/SSO/admin/default.aspx",
   },
   {

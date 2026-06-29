@@ -33,12 +33,30 @@ export default function InstallInstructions({ hasReply = true }: { hasReply?: bo
         <li>Send yourself a test email to confirm it looks correct.</li>
       </ol>
 
-      <div className="notice notice-info" style={{ marginTop: 16 }}>
-        <strong>Using HubSpot (or another editor that rejects the paste)?</strong> Some editors
-        sanitize a normal paste and drop the formatting. Click <strong>Copy HTML</strong> instead,
-        switch that editor to its <strong>HTML / source view</strong> (often a <code>&lt;&gt;</code>{" "}
-        icon), and paste there.
-      </div>
+      <hr className="divider" />
+
+      <h3 style={{ fontSize: 16, color: "var(--navy)", margin: "0 0 4px" }}>
+        Using HubSpot instead?
+      </h3>
+      <p className="card-sub">
+        HubSpot&apos;s signature editor strips a normal paste, so paste the HTML directly.
+      </p>
+      <ol>
+        <li>
+          In the preview, click <strong>Copy HTML</strong>.
+        </li>
+        <li>
+          Open HubSpot&apos;s <strong>Manage email signatures</strong> editor.
+        </li>
+        <li>
+          Above the signature box, switch the <strong>Simple / HTML</strong> toggle to{" "}
+          <strong>HTML</strong>.
+        </li>
+        <li>
+          Select everything in the box, paste (<code>Ctrl+V</code> / <code>Cmd+V</code>), and click{" "}
+          <strong>Save</strong>.
+        </li>
+      </ol>
 
       <div className="notice notice-warn" style={{ marginTop: 16 }}>
         <strong>Please don't hand-edit your signature.</strong> Fonts, colors, sizing, and layout
