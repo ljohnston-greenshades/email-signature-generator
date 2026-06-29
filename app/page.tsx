@@ -31,7 +31,7 @@ export default function BuilderPage() {
   const [config, setConfig] = useState<SignatureConfig>(EMPTY);
   const [banners, setBanners] = useState<Banner[]>([]);
   const [bannersLoading, setBannersLoading] = useState(true);
-  const [copied, setCopied] = useState<"full" | "reply" | null>(null);
+  const [copied, setCopied] = useState<"full" | "reply" | "html" | null>(null);
   const [step, setStep] = useState(1);
 
   // HubSpot directory prefill
@@ -127,6 +127,8 @@ export default function BuilderPage() {
   );
 
   const ready = config.name.trim().length > 0 && config.title.trim().length > 0;
+  const TOLL_FREE = "888-255-3815";
+  const usingTollFree = config.phone?.replace(/\D/g, "") === TOLL_FREE.replace(/\D/g, "");
 
   const fullHtml = useMemo(
     () => renderFullSignature(config, { banner: selectedBanner }),
@@ -161,6 +163,19 @@ export default function BuilderPage() {
       await navigator.clipboard.writeText(html);
       setCopied(which);
       setTimeout(() => setCopied(null), 2200);
+    }
+  }
+
+  // Copies the raw HTML source as plain text — for editors that don't accept a
+  // rich paste (e.g. HubSpot's signature editor, where you paste into its HTML
+  // / source view).
+  async function copyHtmlSource() {
+    try {
+      await navigator.clipboard.writeText(fullHtml);
+      setCopied("html");
+      setTimeout(() => setCopied(null), 2200);
+    } catch {
+      /* clipboard unavailable */
     }
   }
 
@@ -306,8 +321,21 @@ export default function BuilderPage() {
                   type="tel"
                   value={config.phone}
                   placeholder="555 555 5555"
+                  disabled={usingTollFree}
                   onChange={(e) => update("phone", e.target.value)}
+                  style={usingTollFree ? { background: "#f0f2f5", color: "var(--muted)" } : undefined}
                 />
+                <div className="checkbox-row" style={{ borderBottom: "none", paddingBottom: 0, marginTop: 8 }}>
+                  <input
+                    id="tollfree"
+                    type="checkbox"
+                    checked={usingTollFree}
+                    onChange={(e) => update("phone", e.target.checked ? TOLL_FREE : "")}
+                  />
+                  <label htmlFor="tollfree" style={{ marginBottom: 0, fontWeight: 400 }}>
+                    Use Greenshades&apos; toll-free number <span className="meta">(888-255-3815)</span>
+                  </label>
+                </div>
               </div>
 
               <hr className="divider" />
@@ -455,6 +483,9 @@ export default function BuilderPage() {
                 onClick={() => copySignature("full")}
               >
                 {copied === "full" ? "✓ Copied!" : "Copy full signature"}
+              </button>
+              <button className="btn btn-secondary" disabled={!ready} onClick={copyHtmlSource}>
+                {copied === "html" ? "✓ Copied!" : "Copy HTML"}
               </button>
             </div>
 

@@ -171,7 +171,9 @@ function linksBlock(config: SignatureConfig): string {
 
   const hairline =
     `<tr><td style="padding:10px 0 0 0;"><table cellpadding="0" cellspacing="0" border="0" width="460" style="border-collapse:collapse;"><tr><td width="460" height="1" bgcolor="${BRAND.hairline}" style="font-size:1px;line-height:1px;">&nbsp;</td></tr></table></td></tr>`;
-  const separator = `<span style="color:${BRAND.pipe};margin:0 8px;">|</span>`;
+  // Use non-breaking spaces (not margin) so the gap survives in Outlook, which
+  // ignores margins on inline spans.
+  const separator = `<span style="color:${BRAND.pipe};">&nbsp;&nbsp;|&nbsp;&nbsp;</span>`;
   const inlineRow = inlineParts.length
     ? `<tr><td style="padding:10px 0 0 0;font-family:${BRAND.fonts.sans};font-size:13px;line-height:1.3;">${inlineParts.join(separator)}</td></tr>`
     : "";

@@ -33,6 +33,13 @@ export default function InstallInstructions({ hasReply = true }: { hasReply?: bo
         <li>Send yourself a test email to confirm it looks correct.</li>
       </ol>
 
+      <div className="notice notice-info" style={{ marginTop: 16 }}>
+        <strong>Using HubSpot (or another editor that rejects the paste)?</strong> Some editors
+        sanitize a normal paste and drop the formatting. Click <strong>Copy HTML</strong> instead,
+        switch that editor to its <strong>HTML / source view</strong> (often a <code>&lt;&gt;</code>{" "}
+        icon), and paste there.
+      </div>
+
       <div className="notice notice-warn" style={{ marginTop: 16 }}>
         <strong>Please don't hand-edit your signature.</strong> Fonts, colors, sizing, and layout
         are standardized for brand consistency. If something looks off or you need a change, contact

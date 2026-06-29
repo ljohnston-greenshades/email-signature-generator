@@ -57,8 +57,8 @@ export interface StandardLinkDef {
 export const STANDARD_LINKS: StandardLinkDef[] = [
   {
     id: "support",
-    text: "Visit our Support Center",
-    url: "https://support.greenshadesonline.com",
+    text: "Visit our support portal",
+    url: "https://support.greenshadesonline.com/SignIn?returnUrl=%2F",
   },
   {
     id: "login",
