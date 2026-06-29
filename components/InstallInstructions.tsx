@@ -35,9 +35,7 @@ export default function InstallInstructions({ hasReply = true }: { hasReply?: bo
 
       <hr className="divider" />
 
-      <h3 style={{ fontSize: 16, color: "var(--navy)", margin: "0 0 4px" }}>
-        Using HubSpot instead?
-      </h3>
+      <h3 style={{ fontSize: 16, color: "var(--navy)", margin: "0 0 4px" }}>Using HubSpot too?</h3>
       <p className="card-sub">
         HubSpot&apos;s signature editor strips a normal paste, so paste the HTML directly.
       </p>
@@ -46,7 +44,15 @@ export default function InstallInstructions({ hasReply = true }: { hasReply?: bo
           In the preview, click <strong>Copy HTML</strong>.
         </li>
         <li>
-          Open HubSpot&apos;s <strong>Manage email signatures</strong> editor.
+          Open your{" "}
+          <a
+            href="https://app.hubspot.com/settings/24081706/user-preferences/email"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            HubSpot email preferences
+          </a>{" "}
+          and click <strong>Manage email signatures</strong>.
         </li>
         <li>
           Above the signature box, switch the <strong>Simple / HTML</strong> toggle to{" "}
