@@ -1,4 +1,4 @@
-# Greenshades Email Signature Builder
+# Greenshades email signature builder
 
 A Next.js app that lets any Greenshades employee build a personalized,
 brand-compliant email signature for Outlook — with guardrails so the design stays
