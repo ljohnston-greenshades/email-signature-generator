@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { STANDARD_LINKS, type StandardLinkId } from "@/lib/brand";
-import { renderFullSignature, renderReplySignature } from "@/lib/signature";
+import { STANDARD_LINKS, SUPPORT_PHONE, SUPPORT_ROW, type StandardLinkId } from "@/lib/brand";
+import { renderFullSignature, renderReplySignature, isSupportPhone } from "@/lib/signature";
 import type { Banner, SignatureConfig } from "@/lib/types";
 import SignaturePreview from "@/components/SignaturePreview";
 import BannerPicker from "@/components/BannerPicker";
@@ -15,6 +15,7 @@ const EMPTY: SignatureConfig = {
   includeLinkedIn: false,
   linkedInUrl: "",
   links: [],
+  supportRow: false,
   meetingUrl: "",
   bannerId: undefined,
   replyStyle: "compact",
@@ -127,8 +128,7 @@ export default function BuilderPage() {
   );
 
   const ready = config.name.trim().length > 0 && config.title.trim().length > 0;
-  const TOLL_FREE = "888-255-3815";
-  const usingTollFree = config.phone?.replace(/\D/g, "") === TOLL_FREE.replace(/\D/g, "");
+  const usingTollFree = isSupportPhone(config.phone);
 
   const fullHtml = useMemo(
     () => renderFullSignature(config, { banner: selectedBanner }),
@@ -182,7 +182,7 @@ export default function BuilderPage() {
   return (
     <main className="container">
       <div className="intro">
-        <h1>Greenshades Email Signature Builder</h1>
+        <h1>Greenshades email signature builder</h1>
         <p>
           Create your personalized, brand-compliant signature for Outlook in about two minutes.
           Fonts, colors, the logo, and layout are standardized.
@@ -330,10 +330,10 @@ export default function BuilderPage() {
                     id="tollfree"
                     type="checkbox"
                     checked={usingTollFree}
-                    onChange={(e) => update("phone", e.target.checked ? TOLL_FREE : "")}
+                    onChange={(e) => update("phone", e.target.checked ? SUPPORT_PHONE : "")}
                   />
                   <label htmlFor="tollfree" style={{ marginBottom: 0, fontWeight: 400 }}>
-                    Use Greenshades&apos; toll-free number <span className="meta">(888-255-3815)</span>
+                    Use Greenshades&apos; toll-free number <span className="meta">({SUPPORT_PHONE})</span>
                   </label>
                 </div>
               </div>
@@ -382,20 +382,29 @@ export default function BuilderPage() {
                 Optional links shown below your logo. Text and URLs for the first two are locked for
                 brand consistency.
               </p>
-              {STANDARD_LINKS.map((link) => (
+              {STANDARD_LINKS.map((link) => {
+                const coveredBySupportRow = link.id === "support" && Boolean(config.supportRow);
+                return (
                 <div key={link.id}>
                   <div className="checkbox-row">
                     <input
                       id={`link-${link.id}`}
                       type="checkbox"
                       checked={config.links.includes(link.id)}
+                      disabled={coveredBySupportRow}
                       onChange={() => toggleLink(link.id)}
                     />
                     <div>
                       <label htmlFor={`link-${link.id}`} style={{ marginBottom: 2 }}>
                         {link.text}
                       </label>
-                      <div className="meta">{link.requiresUrl ? link.helper : link.url}</div>
+                      <div className="meta">
+                        {coveredBySupportRow
+                          ? "Included in your support row below."
+                          : link.requiresUrl
+                            ? link.helper
+                            : link.url}
+                      </div>
                     </div>
                   </div>
                   {link.requiresUrl && config.links.includes(link.id) && (
@@ -409,7 +418,31 @@ export default function BuilderPage() {
                     </div>
                   )}
                 </div>
-              ))}
+                );
+              })}
+
+              <hr className="divider" />
+
+              <h3 style={{ fontSize: 16, color: "var(--navy)", margin: "0 0 4px" }}>Support</h3>
+              <div className="checkbox-row" style={{ borderBottom: "none", paddingBottom: 0 }}>
+                <input
+                  id="support-row"
+                  type="checkbox"
+                  checked={Boolean(config.supportRow)}
+                  onChange={(e) => update("supportRow", e.target.checked)}
+                />
+                <div>
+                  <label htmlFor="support-row" style={{ marginBottom: 2 }}>
+                    Add a support row
+                  </label>
+                  <div className="meta">
+                    Shows “{SUPPORT_ROW.prompt} {SUPPORT_ROW.linkText}” under your contact details
+                    {usingTollFree
+                      ? ". Your toll-free number is already your direct line, so it won't repeat."
+                      : `, with the toll-free number (${SUPPORT_PHONE}).`}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 

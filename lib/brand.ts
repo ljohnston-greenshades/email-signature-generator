@@ -73,4 +73,15 @@ export const STANDARD_LINKS: StandardLinkDef[] = [
   },
 ];
 
+// Greenshades' toll-free support line. Used by the "toll-free number" checkbox
+// (as the direct line) and by the optional support row.
+export const SUPPORT_PHONE = "888-255-3815";
+
+// Optional "support row" shown under the contact details. Wording is locked;
+// the portal URL is the same one behind the standard "support" link.
+export const SUPPORT_ROW = {
+  prompt: "Need help?",
+  linkText: "Visit our support portal",
+} as const;
+
 export const LINKEDIN_DISPLAY_TEXT = "Connect on LinkedIn";

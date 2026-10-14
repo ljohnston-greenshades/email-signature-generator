@@ -29,7 +29,7 @@ export default function MarketingPage() {
   return (
     <main className="container">
       <div className="intro">
-        <h1>Marketing — Banner Manager</h1>
+        <h1>Marketing: banner manager</h1>
         <p>
           Upload campaign banners and tag them with UTM tracking. Published banners become available
           to all employees in the signature builder.

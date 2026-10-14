@@ -32,6 +32,8 @@ export interface SignatureConfig {
   links: StandardLinkId[];
   /** URL for the "Schedule a Meeting" (D) option when selected. */
   meetingUrl?: string;
+  /** Adds the "Need help?" support row (portal link + toll-free number). */
+  supportRow?: boolean;
   /** Selected banner id, if any. */
   bannerId?: string;
   /** Reply/forward signature style. Defaults to "compact". */
