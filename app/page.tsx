@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { STANDARD_LINKS, SUPPORT_PHONE, SUPPORT_ROW, type StandardLinkId } from "@/lib/brand";
+import { STANDARD_LINKS, SUPPORT_PHONE, type StandardLinkId } from "@/lib/brand";
 import { renderFullSignature, renderReplySignature, isSupportPhone } from "@/lib/signature";
 import type { Banner, SignatureConfig } from "@/lib/types";
 import SignaturePreview from "@/components/SignaturePreview";
@@ -15,7 +15,6 @@ const EMPTY: SignatureConfig = {
   includeLinkedIn: false,
   linkedInUrl: "",
   links: [],
-  supportRow: false,
   meetingUrl: "",
   bannerId: undefined,
   replyStyle: "compact",
@@ -379,11 +378,11 @@ export default function BuilderPage() {
             <div className="card">
               <h2>Standard links</h2>
               <p className="card-sub">
-                Optional links shown below your logo. Text and URLs for the first two are locked for
-                brand consistency.
+                Optional links shown below your logo, on one line. Text and URLs are locked for brand
+                consistency; only the meeting link is yours.
               </p>
               {STANDARD_LINKS.map((link) => {
-                const coveredBySupportRow = link.id === "support" && Boolean(config.supportRow);
+                const duplicatesDirectLine = Boolean(link.isPhone) && usingTollFree;
                 return (
                 <div key={link.id}>
                   <div className="checkbox-row">
@@ -391,19 +390,17 @@ export default function BuilderPage() {
                       id={`link-${link.id}`}
                       type="checkbox"
                       checked={config.links.includes(link.id)}
-                      disabled={coveredBySupportRow}
+                      disabled={duplicatesDirectLine}
                       onChange={() => toggleLink(link.id)}
                     />
                     <div>
                       <label htmlFor={`link-${link.id}`} style={{ marginBottom: 2 }}>
-                        {link.text}
+                        {link.optionLabel ?? link.text}
                       </label>
                       <div className="meta">
-                        {coveredBySupportRow
-                          ? "Included in your support row below."
-                          : link.requiresUrl
-                            ? link.helper
-                            : link.url}
+                        {duplicatesDirectLine
+                          ? "Already your direct line, so it won't repeat."
+                          : (link.helper ?? link.url)}
                       </div>
                     </div>
                   </div>
@@ -420,29 +417,6 @@ export default function BuilderPage() {
                 </div>
                 );
               })}
-
-              <hr className="divider" />
-
-              <h3 style={{ fontSize: 16, color: "var(--navy)", margin: "0 0 4px" }}>Support</h3>
-              <div className="checkbox-row" style={{ borderBottom: "none", paddingBottom: 0 }}>
-                <input
-                  id="support-row"
-                  type="checkbox"
-                  checked={Boolean(config.supportRow)}
-                  onChange={(e) => update("supportRow", e.target.checked)}
-                />
-                <div>
-                  <label htmlFor="support-row" style={{ marginBottom: 2 }}>
-                    Add a support row
-                  </label>
-                  <div className="meta">
-                    Shows “{SUPPORT_ROW.prompt} {SUPPORT_ROW.linkText}” under your contact details
-                    {usingTollFree
-                      ? ". Your toll-free number is already your direct line, so it won't repeat."
-                      : `, with the toll-free number (${SUPPORT_PHONE}).`}
-                  </div>
-                </div>
-              </div>
             </div>
           )}
 
