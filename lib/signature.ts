@@ -1,4 +1,4 @@
-import { BRAND, STANDARD_LINKS, LINKEDIN_DISPLAY_TEXT, SUPPORT_PHONE, SUPPORT_ROW } from "./brand";
+import { BRAND, STANDARD_LINKS, LINKEDIN_DISPLAY_TEXT, SUPPORT_PHONE } from "./brand";
 import type { Banner, SignatureConfig } from "./types";
 
 // ---------------------------------------------------------------------------
@@ -113,28 +113,6 @@ export function isSupportPhone(raw?: string): boolean {
   return (raw ?? "").replace(/\D/g, "") === SUPPORT_PHONE.replace(/\D/g, "");
 }
 
-// Optional "Need help?" row: support portal link plus the toll-free number.
-// When the toll-free number is already the employee's direct line, the number
-// is dropped here so it never appears twice.
-function supportRow(config: SignatureConfig): string {
-  if (!config.supportRow) return "";
-  const supportLink = STANDARD_LINKS.find((l) => l.id === "support");
-  if (!supportLink?.url) return "";
-
-  const phone = isSupportPhone(config.phone) ? null : normalizePhone(SUPPORT_PHONE);
-  const separator = `<span style="color:${BRAND.pipe};">&nbsp;&nbsp;|&nbsp;&nbsp;</span>`;
-  const parts =
-    `<a href="${safeUrl(supportLink.url)}" target="_blank" style="color:${BRAND.navy};text-decoration:underline;">${escapeHtml(SUPPORT_ROW.linkText)}</a>` +
-    (phone
-      ? `${separator}<a href="tel:${escapeHtml(phone.href)}" style="color:${BRAND.navy};text-decoration:none;">${escapeHtml(phone.display)}</a>`
-      : "");
-
-  return (
-    `<tr><td style="padding:3px 0 1px 0;font-family:${BRAND.fonts.sans};font-size:13px;line-height:18px;color:${BRAND.navy};">` +
-    `<span style="font-weight:bold;">${escapeHtml(SUPPORT_ROW.prompt)}</span>&nbsp; ${parts}</td></tr>`
-  );
-}
-
 /**
  * Normalize whatever the employee pastes into a clean LinkedIn profile URL.
  * Accepts a full URL, a bare "linkedin.com/in/handle", "in/handle", or just
@@ -172,12 +150,19 @@ function linksBlock(config: SignatureConfig): string {
   const inlineParts: string[] = [];
   let meetingButton = "";
 
-  for (const id of config.links) {
-    // The support row already carries the portal link — don't show it twice.
-    if (id === "support" && config.supportRow) continue;
-    const def = STANDARD_LINKS.find((l) => l.id === id);
-    if (!def) continue;
-    if (def.requiresUrl) {
+  // Fixed display order (login | support portal | phone), whatever order the
+  // boxes were ticked in.
+  for (const def of STANDARD_LINKS) {
+    if (!config.links.includes(def.id)) continue;
+    if (def.isPhone) {
+      // Already the employee's direct line? Don't show it twice.
+      if (isSupportPhone(config.phone)) continue;
+      const phone = normalizePhone(SUPPORT_PHONE);
+      if (!phone) continue;
+      inlineParts.push(
+        `<a href="tel:${escapeHtml(phone.href)}" style="color:${BRAND.navy};text-decoration:none;">${escapeHtml(phone.display)}</a>`
+      );
+    } else if (def.requiresUrl) {
       const url = config.meetingUrl;
       if (!url?.trim()) continue; // option D with no URL → skip
       // Outlook-safe button: a <td> with bgcolor + padding (border-radius is
@@ -235,7 +220,6 @@ export function renderFullSignature(config: SignatureConfig, opts: RenderOptions
     `<tr><td style="padding:0 0 1px 0;"><span style="display:block;font-family:${BRAND.fonts.serif};font-size:17px;font-weight:bold;color:${BRAND.navy};line-height:1.3;">${name}</span></td></tr>` +
     `<tr><td style="padding:0 0 1px 0;"><span style="display:block;font-family:${BRAND.fonts.sans};font-size:12px;font-weight:normal;color:${BRAND.charcoal};line-height:1.4;">${title}</span></td></tr>` +
     contactLine(config) +
-    supportRow(config) +
     // CORRECTION: the "Web:" row is removed — the linked logo IS the website link.
     // Spacer between contact details and the logo block.
     `<tr><td style="padding:0 0 11px 0;font-size:0;line-height:0;">&nbsp;</td></tr>` +

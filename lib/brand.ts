@@ -42,28 +42,48 @@ export const BRAND = {
   },
 } as const;
 
-// Standard, brand-approved link options shown below the logo. Text + URLs for
-// A/B/C are fully locked. D's text is locked; the employee supplies the URL.
-export type StandardLinkId = "support" | "login" | "meeting";
+// Greenshades' toll-free support line. Used by the "toll-free number" checkbox
+// (as the direct line) and by the "support phone" standard link.
+export const SUPPORT_PHONE = "888-255-3815";
+
+// Standard, brand-approved options shown below the logo. Text + URLs for the
+// login / support / phone options are fully locked. The meeting option's text is
+// locked; the employee supplies the URL. Login, support and phone render in this
+// order on one pipe-separated line; the meeting option is a button underneath.
+export type StandardLinkId = "login" | "support" | "phone" | "meeting";
 
 export interface StandardLinkDef {
   id: StandardLinkId;
+  /** Text as it appears in the signature. */
   text: string;
-  url?: string; // undefined => employee must provide (option D)
+  /** Checkbox label in the builder, when different from `text`. */
+  optionLabel?: string;
+  url?: string; // undefined => employee must provide (meeting)
+  /** Renders as a tel: link to SUPPORT_PHONE instead of a URL. */
+  isPhone?: boolean;
   requiresUrl?: boolean;
   helper?: string;
 }
 
 export const STANDARD_LINKS: StandardLinkDef[] = [
   {
+    id: "login",
+    text: "Log in",
+    optionLabel: "Log in to Greenshades",
+    url: "https://www.greenshadesonline.com/SSO/admin/default.aspx",
+  },
+  {
     id: "support",
-    text: "Visit our support portal",
+    text: "Support portal",
+    optionLabel: "Visit our support portal",
     url: "https://support.greenshadesonline.com/SignIn?returnUrl=%2F",
   },
   {
-    id: "login",
-    text: "Log in to Greenshades",
-    url: "https://www.greenshadesonline.com/SSO/admin/default.aspx",
+    id: "phone",
+    text: "(888) 255-3815",
+    optionLabel: "Call support",
+    isPhone: true,
+    helper: "Greenshades' toll-free support number, (888) 255-3815",
   },
   {
     id: "meeting",
@@ -72,16 +92,5 @@ export const STANDARD_LINKS: StandardLinkDef[] = [
     helper: "Paste your personal Calendly or HubSpot scheduling link",
   },
 ];
-
-// Greenshades' toll-free support line. Used by the "toll-free number" checkbox
-// (as the direct line) and by the optional support row.
-export const SUPPORT_PHONE = "888-255-3815";
-
-// Optional "support row" shown under the contact details. Wording is locked;
-// the portal URL is the same one behind the standard "support" link.
-export const SUPPORT_ROW = {
-  prompt: "Need help?",
-  linkText: "Visit our support portal",
-} as const;
 
 export const LINKEDIN_DISPLAY_TEXT = "Connect on LinkedIn";
